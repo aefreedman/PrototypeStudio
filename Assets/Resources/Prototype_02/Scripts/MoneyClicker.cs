@@ -21,6 +21,11 @@ public class MoneyClicker : MonoBehaviour
             makerInstance.MakeMoney(transform.position, clickingMakesThisMuch);
             clickingMakesThisMuch += clickingAdd;
             clickingMakesThisMuch *= clickingMultiplier;
+            MMGameManager.instance.mainCamera.GetComponent<ScreenShake>().StartShake(0.1f, 0.1f);
+            if (Random.Range(0, 100) == 0)
+            {
+                MMGameManager.instance.CreateEventMessage("Dolla dolla billz, yall!", Color.yellow, 2.0f);
+            }
         }
     }
     

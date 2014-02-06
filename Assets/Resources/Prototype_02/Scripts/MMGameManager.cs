@@ -4,6 +4,7 @@ using MMConstants;
 
 public class MMGameManager : MonoBehaviour
 {
+    public GameObject mainCamera;
     private List<MoneyRecepticle> moneyRecepticles;
     public float dollars;
     public TextMesh textMesh;
@@ -19,11 +20,14 @@ public class MMGameManager : MonoBehaviour
     public float moneyMakerCost;
     public float moneyMakerUpkeep;
     public float recepticleUpkeep;
-    private float lastUpkeep;
-    public float upkeepSeconds;
+    private float lastTax;
+    public float taxPeriod;
     public float shuttleUpgradeCost;
     public float shuttleUpgradeCostMultiplier;
     public float shuttleSpeedAdd;
+    public GameObject eventTextAnchor;
+    public GameObject eventTextPrefab;
+    public AudioClip scream;
 
     public static MMGameManager instance;
 
@@ -34,19 +38,14 @@ public class MMGameManager : MonoBehaviour
 
     private void Start()
     {
-        lastUpkeep = Time.time;
+        lastTax = Time.time;
         moneyRecepticles = new List<MoneyRecepticle>();
         MoneyRecepticle[] r = FindObjectsOfType<MoneyRecepticle>();
         moneyRecepticles.AddRange(r);
         instance = MMGameManager.Instance();
         dollars += startingCash;
         Physics.gravity = new Vector3(0, -5.0f, 0);
-
-        //int recepticlesToSpawn = Mathf.CeilToInt(dollars / RecepticlesHoldThisMuch);
-        //for (int i = 0; i < recepticlesToSpawn; i++)
-        //{
-        //    SpawnRecepticle();
-        //}
+        mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
     }
 
     private void Update()
@@ -63,11 +62,23 @@ public class MMGameManager : MonoBehaviour
 
         if (moneyMaker != null || recepticles > 0)
         {
-            if (Time.time > lastUpkeep + upkeepSeconds)
+            if (Time.time > lastTax + taxPeriod)
             {
-                Upkeep((recepticleUpkeep * recepticles * 1.1f) + moneyMakerUpkeep);
-                lastUpkeep = Time.time;
+                if (dollars > 0)
+                {
+                    Taxes((recepticleUpkeep * recepticles * 1.1f) + moneyMakerUpkeep + (dollars * 0.05f));
+                }
+                else
+                {
+                    Taxes((recepticleUpkeep * recepticles * 1.1f) + moneyMakerUpkeep);
+                }
+
+                lastTax = Time.time;
             }
+        }
+        else
+        {
+            lastTax = Time.time;
         }
 
 
@@ -147,6 +158,15 @@ public class MMGameManager : MonoBehaviour
         }
     }
 
+    public bool CheckDollars(float amount)
+    {
+        if (amount < dollars)
+        {
+            return true;
+        }
+        else return false;
+    }
+
     public void NeedMoreMoney(float amount)
     {
         GameObject g = GameObject.Instantiate(moneyParticle, moneyParticleSpawn.transform.position, Quaternion.identity) as GameObject;
@@ -158,7 +178,7 @@ public class MMGameManager : MonoBehaviour
     {
         GameObject g = GameObject.Instantiate(moneyParticle, moneyParticleSpawn.transform.position, Quaternion.identity) as GameObject;
         MoneyParticle p = g.GetComponent<MoneyParticle>();
-        p.SetText("Need more recepticles! (" + amount.ToString() + ")", Color.red);
+        p.SetText("Need more bags! (" + amount.ToString() + ")", Color.red);
     }
 
     public void SpawnItem(Item item)
@@ -186,7 +206,13 @@ public class MMGameManager : MonoBehaviour
                         SpawnMoneyMaker();
                     }
                 }
-
+                break;
+            case Item.Premium:
+                //eventText.SendText("Premium Version Only!", new Color(1f, 0.5f, 0));
+                CreateEventMessage("Premium Version Only!", new Color(1f, 0.5f, 0));
+                break;
+            case Item.GiveUp:
+                Application.LoadLevel(0);
                 break;
             default:
                 break;
@@ -196,9 +222,10 @@ public class MMGameManager : MonoBehaviour
     private void SpawnRecepticle()
     {
         GameObject o = GameObject.Instantiate(recepticlePrefab) as GameObject;
-        recepticleCost *= 1.0f + (0.01f * moneyRecepticles.Count);
+        recepticleCost *= 1.0f + (0.001f * moneyRecepticles.Count); // TODO extract this multiplier into a variable
         MoneyRecepticle r = o.GetComponent<MoneyRecepticle>();
         moneyRecepticles.Add(r);
+        CreateEventMessage("Hold dat !@&#", new Color(0.75f, 1.0f, 0.75f), 2.0f);
     }
 
     private void SpawnMoneyMaker()
@@ -206,19 +233,33 @@ public class MMGameManager : MonoBehaviour
         GameObject o = GameObject.Instantiate(moneyMakerPrefab) as GameObject;
         MoneyMaker m = o.GetComponent<MoneyMaker>();
         moneyMaker = m;
+        //eventText.SendText("Make that money!", Color.yellow, 2.0f);
+        CreateEventMessage("Make that money!", Color.yellow, 2.0f);
     }
 
     private void IncreaseShuttleSpeed()
     {
         moneyMaker.speed += shuttleSpeedAdd;
         shuttleUpgradeCost *= shuttleUpgradeCostMultiplier;
+        CreateEventMessage("Speed yo ass up", Color.white, 2.0f);
     }
 
-    private void Upkeep(float amount)
+    private void Taxes(float amount)
     {
         dollars -= Mathf.Abs(amount);
         GameObject g = GameObject.Instantiate(moneyParticle, moneyParticleSpawn.transform.position, Quaternion.identity) as GameObject;
         MoneyParticle p = g.GetComponent<MoneyParticle>();
-        p.SetText("-$" + amount.ToString("0.00") + " (Upkeep)", Color.red);
+        p.SetText("-$" + amount.ToString("0.00") + " (Taxes)", Color.red);
+        CreateEventMessage("TAXES", Color.red, 1.0f);
+        audio.PlayOneShot(scream);
+        mainCamera.GetComponent<ScreenShake>().StartShake(0.1f, 0.5f);
+    }
+
+    public void CreateEventMessage(string text, Color color, float time = 1.0f)
+    {
+        GameObject o = GameObject.Instantiate(eventTextPrefab) as GameObject;
+        o.GetComponent<SpringJoint>().connectedBody = eventTextAnchor.GetComponent<Rigidbody>();
+        EventText e = o.GetComponent<EventText>();
+        e.SendText(text, color, time);
     }
 }
