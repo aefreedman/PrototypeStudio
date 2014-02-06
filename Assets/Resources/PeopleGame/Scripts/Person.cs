@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+//using UnityEditor;
 
 public class Person : MonoBehaviour
 {
@@ -42,6 +43,7 @@ public class Person : MonoBehaviour
     public void Initialize()
     {
         alive = true;
+        name = "Temporary Name";
 
         if (Random.Range(0, 100) < RELATIONSHIP_CHANCE)
         {
@@ -68,6 +70,68 @@ public class Person : MonoBehaviour
     private void Update()
     {
     }
+    
+    void OnDrawGizmos()
+    {
+        if (alive)
+        {
+            //if (UnityEditor.Selection.activeGameObject != this.gameObject)
+            //{
+                switch (sex)
+                {
+                    case Sex.male:
+                        Gizmos.color = Color.blue;
+                        break;
+                    case Sex.female:
+                        Gizmos.color = new Color(1, 0.5f, 0.5f);
+                        break;
+                    case Sex.herma:
+                        break;
+                    default:
+                        break;
+                }
+
+                if (relationship && significantOther == null)
+                {
+                    Gizmos.color = Color.red;
+                }
+
+                Gizmos.DrawCube(transform.position, Vector3.one);
+
+                if (significantOther != null)
+                {
+                    Gizmos.color = Color.green;
+                    Gizmos.DrawLine(transform.position, significantOther.transform.position);
+                }
+
+            //}
+            //else
+            //{
+            //    Gizmos.DrawWireCube(transform.position, Vector3.one);
+
+            //    if (relationship)
+            //    {
+            //        Gizmos.color = Color.red;
+            //        Gizmos.DrawSphere(transform.position, 0.1f);
+            //    }
+
+            //}
+        }
+        else
+        {
+            Gizmos.color = Color.black;
+            Gizmos.DrawCube(transform.position, Vector3.one / 2);
+        }
+        
+
+    }
+    
+    void OnDrawGizmosSelected()
+    {
+        //Gizmos.DrawCube(transform.position, Vector3.one);
+    }
+    
+    
 
     private int WealthSolver()
     {
@@ -137,5 +201,8 @@ public class Person : MonoBehaviour
     public void Kill()
     {
         alive = false;
+        World w = World.Instance();
+        w.people.Remove(this);
+        w.deceased.Add(this);
     }
 }

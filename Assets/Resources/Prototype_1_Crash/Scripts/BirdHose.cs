@@ -21,15 +21,18 @@ public class BirdHose : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0))
         {
-            //if (Time.time - lastSpawn > birdSpawnDelay)
-            //{
+            CrashGameManager gm = CrashGameManager.Instance();
+            if (gm.birds > 0)
+            {
                 GameObject o = Instantiate(birdPrefab, new Vector3(transform.position.x, transform.position.y, transform.position.z), Quaternion.identity) as GameObject;
                 Bird b = o.GetComponent<Bird>();
                 b.SetDirection(direction);
                 b.SetForce(force);
                 lastSpawn = Time.time;
-                CrashGameManager.Instance().UseBird();
-            //}
+                gm.UseBird();
+            }
+
+
         }
 
 

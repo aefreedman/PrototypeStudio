@@ -9,7 +9,7 @@ namespace Dictionary
 
         private static readonly IDictionary<type, string> prefabNames = new Dictionary<type, string>
         {
-            {type.Person, "Prefabs/Person"}
+            {type.Person, "PeopleGame/Prefabs/Person"}
         };
         public static IDictionary<type, string> PREFAB_NAMES { get { return prefabNames; } }
     }
