@@ -3,5 +3,5 @@ using System.Collections;
 
 namespace MMConstants
 {
-    public enum Item { Recepticle };
+    public enum Item { Recepticle, MoneyMaker, ShuttleSpeed };
 }

@@ -6,6 +6,8 @@ public class MoneyClicker : MonoBehaviour
     public GameObject moneyMaker;
     private MoneyMaker makerInstance;
     public float clickingMakesThisMuch;
+    public float clickingAdd;
+    public float clickingMultiplier;
     
     private void Start()
     {
@@ -17,6 +19,8 @@ public class MoneyClicker : MonoBehaviour
         if (Input.GetMouseButtonDown(0))
         {
             makerInstance.MakeMoney(transform.position, clickingMakesThisMuch);
+            clickingMakesThisMuch += clickingAdd;
+            clickingMakesThisMuch *= clickingMultiplier;
         }
     }
     

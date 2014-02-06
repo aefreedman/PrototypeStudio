@@ -8,7 +8,7 @@ public class MoneyParticle : MonoBehaviour
 
     private void Start()
     {
-        rigidbody.AddForce(new Vector3(Random.Range(-50, 50), 100, 0));
+        rigidbody.AddForce(new Vector3(Random.Range(-150, 150), 200, 0));
         start = Time.time;
     }
 

@@ -10,6 +10,8 @@ public class MoneyMaker : MonoBehaviour
     public float proxTolerance;
     public GameObject moneyPrefab;
     public float shuttleMakesThisMuch;
+    public float shuttleAdd;
+    public float shuttleMultiplier;
     
     private void Start()
     {
@@ -25,12 +27,14 @@ public class MoneyMaker : MonoBehaviour
         {
             if (target == left)
             {
-                MakeMoney(target.transform.position, shuttleMakesThisMuch);
+                Vector3 pos = new Vector3(target.transform.position.x, target.transform.position.y, -3);
+                MakeMoney(pos, shuttleMakesThisMuch);
                 target = right;
             }
             else
             {
-                MakeMoney(target.transform.position, shuttleMakesThisMuch);
+                Vector3 pos = new Vector3(target.transform.position.x, target.transform.position.y, -3);
+                MakeMoney(pos, shuttleMakesThisMuch);
                 target = left;
             }
         }
@@ -38,11 +42,12 @@ public class MoneyMaker : MonoBehaviour
 
     public void MakeMoney(Vector3 pos, float amount)
     {
-        if (amount > 0)
+        if (MMGameManager.instance.MakeDollars(amount))
         {
             GameObject.Instantiate(moneyPrefab, pos, Quaternion.identity);
-            MMGameManager.instance.MakeDollars(amount);
             audio.PlayOneShot(audio.clip);
+            shuttleMakesThisMuch += shuttleAdd;
+            shuttleMakesThisMuch *= shuttleMultiplier;
         }
     }
 }
