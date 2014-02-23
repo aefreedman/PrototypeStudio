@@ -1,6 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+/// <summary>
+/// Adding this script to an object allows you to drag the object around. 2D only.
+/// </summary>
 public class ClickDrag : MonoBehaviour
 {
 

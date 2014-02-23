@@ -12,10 +12,13 @@ public class MoneyMaker : MonoBehaviour
     public float shuttleMakesThisMuch;
     public float shuttleAdd;
     public float shuttleMultiplier;
-    
+    private MoneyClicker[] clickers;
+    public float maxShake;
+
     private void Start()
     {
         target = left;
+        clickers = GetComponentsInChildren<MoneyClicker>();
     }
 
     private void Update()
@@ -28,26 +31,55 @@ public class MoneyMaker : MonoBehaviour
             if (target == left)
             {
                 Vector3 pos = new Vector3(target.transform.position.x, target.transform.position.y, -3);
-                MakeMoney(pos, shuttleMakesThisMuch);
+                if (MakeMoney(pos, shuttleMakesThisMuch))
+                {
+                    IncrementShuttle();
+                    MMGameManager.Instance.mainCamera.GetComponent<ScreenShake>().StartShake(0.1f + maxShake * Mathf.Clamp(MMGameManager.Instance.dollars, 0, 1000000.0f) / 1000000.0f, 0.1f + maxShake * Mathf.Clamp(MMGameManager.Instance.dollars, 0, 1000000.0f) / 1000000.0f);
+                }
                 target = right;
             }
             else
             {
                 Vector3 pos = new Vector3(target.transform.position.x, target.transform.position.y, -3);
-                MakeMoney(pos, shuttleMakesThisMuch);
+                if (MakeMoney(pos, shuttleMakesThisMuch))
+                {
+                    IncrementShuttle();
+                }
                 target = left;
             }
         }
+
+        float x = 0;
+        foreach (var m in clickers)
+        {
+            if (m.clickingMakesThisMuch > x)
+            {
+                x = m.clickingMakesThisMuch;
+            }
+        }
+        foreach (var c in clickers)
+        {
+            c.clickingMakesThisMuch = x;
+        }
     }
 
-    public void MakeMoney(Vector3 pos, float amount)
+    private void IncrementShuttle()
     {
-        if (MMGameManager.instance.MakeDollars(amount))
+        shuttleMakesThisMuch += shuttleAdd;
+        shuttleMakesThisMuch *= shuttleMultiplier;
+    }
+
+    public bool MakeMoney(Vector3 pos, float amount)
+    {
+        if (MMGameManager.Instance.MakeDollars(amount))
         {
             GameObject.Instantiate(moneyPrefab, pos, Quaternion.identity);
             audio.PlayOneShot(audio.clip);
-            shuttleMakesThisMuch += shuttleAdd;
-            shuttleMakesThisMuch *= shuttleMultiplier;
+            return true;
+        }
+        else
+        {
+            return false;
         }
     }
 }

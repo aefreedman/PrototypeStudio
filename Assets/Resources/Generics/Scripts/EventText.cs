@@ -2,8 +2,7 @@
 
 public class EventText : MonoBehaviour
 {
-
-    TextMesh textMesh;
+    private TextMesh textMesh;
 
     public float displayTime;
     private float activeTime;
@@ -12,14 +11,11 @@ public class EventText : MonoBehaviour
     private int fadeSpeed;
     private Color targetColor;
     private SpringJoint spring;
-    
+    public float lifetime;
+
     private void Start()
     {
         textMesh = GetComponent<TextMesh>();
-        //fade = 0.0f;
-        //FadeOut();
-        //spring = GetComponent<SpringJoint>();
-        //spring.connectedBody = GameObject.FindGameObjectWithTag("EventTextAnchor").GetComponent<Rigidbody>();
     }
 
     private void Update()
@@ -32,23 +28,24 @@ public class EventText : MonoBehaviour
             FadeOut();
         }
 
-        if (activeTime > 10.0f)
+        if (activeTime > lifetime)
         {
             Destroy(gameObject);
         }
     }
 
-    public void SendText(string text, Color color, float _displayTime = 1)
+    public void SendText(string text, Color color, float _displayTime = 1, int _size = 500)
     {
         if (textMesh == null)
         {
             textMesh = GetComponent<TextMesh>();
         }
 
-            
+        textMesh.fontSize = _size;
         textMesh.text = text;
         textMesh.color = new Color(color.r, color.g, color.b, fade);
         displayTime = _displayTime;
+        lifetime = displayTime * 2;
         FadeIn();
     }
 

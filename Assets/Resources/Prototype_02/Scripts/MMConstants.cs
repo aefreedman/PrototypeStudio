@@ -3,6 +3,5 @@ using System.Collections;
 
 namespace MMConstants
 {
-    public enum Item { Recepticle, MoneyMaker, ShuttleSpeed, Premium, GiveUp };
-
+    public enum Item { Recepticle, MoneyMaker, ShuttleSpeed, Premium, GiveUp, Quit };
 }
