@@ -5,7 +5,7 @@
 /// </summary>
 public abstract class MenuBase : MonoBehaviour
 {
-
+    private bool attachedToCamera;
     protected Vector3 openPos;
     protected Vector3 closePos;
     protected Vector3 targetPos;
@@ -30,11 +30,22 @@ public abstract class MenuBase : MonoBehaviour
 
     protected virtual void Start()
     {
-        closePos = transform.position;
-        openPos = new Vector3(closePos.x + openDisplacement.x, closePos.y + openDisplacement.y, closePos.z);
-        targetPos = closePos;
+        if (gameObject.transform.parent.CompareTag("MainCamera"))
+        {
+            closePos = transform.localPosition;
+            targetPos = closePos;
+            attachedToCamera = true;
+        }
+        else
+        {
+            attachedToCamera = false;
+            closePos = transform.position;
+            openPos = new Vector3(closePos.x + openDisplacement.x, closePos.y + openDisplacement.y, closePos.z);
+            targetPos = closePos;
+        }
         menuItems = menuItemContainer.GetComponentsInChildren<MenuItemBase>();
         //SetMenuChoiceStartingConditions();
+
     }
 
     protected virtual void OnMouseOver()
@@ -57,7 +68,17 @@ public abstract class MenuBase : MonoBehaviour
 
     protected virtual void Update()
     {
-        transform.position = Vector3.Lerp(transform.position, targetPos, openSpeed * Time.deltaTime);
+        if (attachedToCamera)
+        {
+            openPos = new Vector3(transform.localPosition.x + openDisplacement.x, transform.localPosition.y + openDisplacement.y, closePos.z);
+            transform.localPosition = Vector3.Lerp(transform.localPosition, targetPos, openSpeed * Time.deltaTime);
+        }
+        else
+        {
+            transform.position = Vector3.Lerp(transform.position, targetPos, openSpeed * Time.deltaTime);
+        }
+
+
         foreach (var i in menuItems)
         {
             Vector3 itemTargetPos = targetPos;
@@ -93,7 +114,7 @@ public abstract class MenuBase : MonoBehaviour
         }
     }
 
-    public void SetToStarConditions()
+    public void SetToStartConditions()
     {
         foreach (var i in menuItems)
         {
@@ -101,6 +122,6 @@ public abstract class MenuBase : MonoBehaviour
             i.Text.color = i.defaultColor;
         }
     }
-    
+
     //protected abstract void SetMenuChoiceStartingConditions();
 }

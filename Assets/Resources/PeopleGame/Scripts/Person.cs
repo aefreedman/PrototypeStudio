@@ -4,8 +4,8 @@
 public class Person : MonoBehaviour
 {
     #region PARAMETERS
-    private int WEALTH_MIN = 1;
-    private int WEALTH_MAX = 100;
+    //private int WEALTH_MIN = 1;
+    //private int WEALTH_MAX = 100;
     private int FAMILY_MIN = 1;
     private int FAMILY_MAX = 3;
     private int RELATIONSHIP_CHANCE = 15;
@@ -19,7 +19,7 @@ public class Person : MonoBehaviour
     #endregion
 
     // list of sprites
-    public string name;
+    //public string name;
     public Sex sex;
     public Sexuality sexuality;
     public Gender gender;

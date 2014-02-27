@@ -3,7 +3,6 @@ using System.Collections;
 
 public class ArrangeOnScreen : MonoBehaviour
 {
-    Camera camera;
     [Range(0.0f, 1.0f)]
     public float x;
     [Range(0.0f, 1.0f)]
@@ -11,9 +10,7 @@ public class ArrangeOnScreen : MonoBehaviour
 
     void Start()
     {
-        camera = FindObjectOfType<Camera>();
-
-        transform.position = camera.ViewportToWorldPoint(new Vector3(x, y, 30));
+        transform.position = Camera.main.ViewportToWorldPoint(new Vector3(x, y, 30));
     }
 
     void Update()

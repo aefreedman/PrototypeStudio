@@ -5,14 +5,13 @@ public class BirdHose : MonoBehaviour
 
     public GameObject birdPrefab;
     public float birdSpawnDelay;
-    private float lastSpawn;
+    //private float lastSpawn;
     public Bird.Direction direction;
     public float force;
-    public Camera camera;
 
     private void Start()
     {
-        lastSpawn = Time.time;
+        //lastSpawn = Time.time;
     }
 
     private void Update()
@@ -28,7 +27,7 @@ public class BirdHose : MonoBehaviour
                 Bird b = o.GetComponent<Bird>();
                 b.SetDirection(direction);
                 b.SetForce(force);
-                lastSpawn = Time.time;
+                //lastSpawn = Time.time;
                 gm.UseBird();
             }
 

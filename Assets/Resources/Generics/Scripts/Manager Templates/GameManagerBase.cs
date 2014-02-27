@@ -2,12 +2,11 @@
 
 public abstract class GameManagerBase : MonoBehaviour
 {
-
     public enum State { PreGame, InGame, GameOver, PostGame };
     public State gameState;
     public bool startDebug;
-    public GameObject eventTextPrefab;
-    public GameObject eventTextAnchor;
+    private GameObject eventTextPrefab;
+    public GameObject[] eventTextAnchor;
     private static GameManagerBase instance;
 
     public static GameManagerBase Instance
@@ -28,34 +27,52 @@ public abstract class GameManagerBase : MonoBehaviour
 
     protected virtual void Start()
     {
-    }
-
-    protected virtual void Update()
-    {
-        switch (gameState)
+        try
         {
-            case State.PreGame:
-                break;
-            case State.InGame:
-                break;
-            case State.GameOver:
-                break;
-            case State.PostGame:
-                break;
-            default:
-                break;
+            eventTextPrefab = Resources.Load<GameObject>("generics/prefabs/eventtext");
+        }
+        catch (System.NullReferenceException)
+        {
+            Debug.LogWarning("Event Text Prefab not found.");
+            throw;
+        }
+
+        eventTextAnchor = GameObject.FindGameObjectsWithTag("EventTextAnchor") as GameObject[];
+        if (eventTextAnchor == null)
+        {
+            Debug.LogWarning("Event Text Anchor missing. Instantiating");
+            eventTextAnchor[0] = GameObject.Instantiate(Resources.Load<GameObject>("generics/prefabs/eventtextanchor")) as GameObject;
         }
 
     }
 
-    public GameObject CreateEventMessage(string text, Color color, float time = 1.0f, float displace = 2.0f, int size = 500)
+    protected virtual void Update()
     {
-        GameObject o = GameObject.Instantiate(eventTextPrefab, eventTextAnchor.transform.position, Quaternion.identity) as GameObject;
-        o.GetComponent<SpringJoint>().connectedBody = eventTextAnchor.GetComponent<Rigidbody>();
+    }
+
+    public GameObject CreateEventMessage(string text, Color color, float time = 1.0f, float displace = 2.0f, int size = 500, int anchorNumber = 0)
+    {
+        GameObject o;
+        try
+        {
+            o = GameObject.Instantiate(eventTextPrefab, eventTextAnchor[anchorNumber].transform.position, Quaternion.identity) as GameObject;
+        }
+        catch (System.NullReferenceException)
+        {
+            Debug.LogError("Event Text Anchor missing");
+            throw;
+        }
+        o.transform.position = eventTextAnchor[anchorNumber].transform.position;
+        o.GetComponent<SpringJoint>().connectedBody = eventTextAnchor[anchorNumber].GetComponent<Rigidbody>();
         o.transform.Translate(Vector3.up * displace);
         EventText e = o.GetComponent<EventText>();
         e.SendText(text, color, time, size);
         return o;
+    }
+
+    public GameObject CreateEventMessage(string text, Color color, int anchorNumber)
+    {
+        return CreateEventMessage(text, color, 1.0f, 2.0f, 500, anchorNumber);
     }
 
     public GameObject SpawnGameObject(GameObject objectToSpawn)

@@ -5,7 +5,6 @@ public class ScreenShake : MonoBehaviour
     Vector3 target;
     Vector3 originalPosition;
     Transform camPos;
-    Camera camera;
     public bool shake;
     private float startTime;
     private float activeTime;
@@ -13,8 +12,7 @@ public class ScreenShake : MonoBehaviour
     
     private void Start()
     {
-        camera = FindObjectOfType<Camera>();
-        originalPosition = camera.gameObject.transform.position;
+        originalPosition = Camera.main.gameObject.transform.position;
         camPos = camera.gameObject.transform;
         target = originalPosition;
         shake = false;
