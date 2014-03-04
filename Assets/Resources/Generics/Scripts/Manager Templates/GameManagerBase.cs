@@ -5,6 +5,7 @@ public abstract class GameManagerBase : MonoBehaviour
     public enum State { PreGame, InGame, GameOver, PostGame };
     public State gameState;
     public bool startDebug;
+    public bool canReset;
     private GameObject eventTextPrefab;
     public GameObject[] eventTextAnchor;
     private static GameManagerBase instance;
@@ -48,6 +49,18 @@ public abstract class GameManagerBase : MonoBehaviour
 
     protected virtual void Update()
     {
+
+    }
+
+    protected virtual void FixedUpdate()
+    {
+        if (canReset)
+        {
+            if (Input.GetKeyDown(KeyCode.R) && (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)))
+            {
+                Application.LoadLevel(Application.loadedLevel);
+            }
+        }
     }
 
     public GameObject CreateEventMessage(string text, Color color, float time = 1.0f, float displace = 2.0f, int size = 500, int anchorNumber = 0)
