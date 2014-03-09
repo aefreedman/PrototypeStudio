@@ -10,7 +10,7 @@ public class AutoRotate : MonoBehaviour
         rotation = new Vector3(rotation.x * Time.deltaTime, rotation.y * Time.deltaTime, rotation.z * Time.deltaTime);
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         transform.Rotate(rotation);
     }

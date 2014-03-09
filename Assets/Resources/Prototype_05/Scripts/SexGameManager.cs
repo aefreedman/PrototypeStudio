@@ -14,8 +14,8 @@ public class SexGameManager : GameManagerBase
     {
         base.Start();
         Physics.gravity = new Vector3(0, 2.0f, 0);
-        List<List<string>> responseList;
-        responseList = CSVReader.ReadFile(responseFileName);
+        //List<List<string>> responseList;
+        //responseList = CSVReader.ReadFile(responseFileName);
         // TODO : Best implemented as key value pairings?
     }
 

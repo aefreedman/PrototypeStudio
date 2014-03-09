@@ -63,7 +63,7 @@ public abstract class GameManagerBase : MonoBehaviour
         }
     }
 
-    public GameObject CreateEventMessage(string text, Color color, float time = 1.0f, float displace = 2.0f, int size = 500, int anchorNumber = 0)
+    public GameObject CreateEventMessage(string text, Color color, float time = 1.0f, float displace = 2.0f, int size = 500, int anchorNumber = 0, bool collideWithOtherText = true)
     {
         GameObject o;
         try
@@ -76,11 +76,25 @@ public abstract class GameManagerBase : MonoBehaviour
             throw;
         }
         o.transform.position = eventTextAnchor[anchorNumber].transform.position;
+        if (!collideWithOtherText)
+        {
+            o.collider.isTrigger = true;
+        }
         o.GetComponent<SpringJoint>().connectedBody = eventTextAnchor[anchorNumber].GetComponent<Rigidbody>();
         o.transform.Translate(Vector3.up * displace);
         EventText e = o.GetComponent<EventText>();
         e.SendText(text, color, time, size);
         return o;
+    }
+
+    public GameObject CreateEventMessage(string text, Color color, int anchorNumber, bool collideWithOtherText)
+    {
+        return CreateEventMessage(text, color, 1.0f, 2.0f, 500, anchorNumber, collideWithOtherText);
+    }
+
+    public GameObject CreateEventMessage(string text, Color color, bool collideWithOtherText)
+    {
+        return CreateEventMessage(text, color, 1.0f, 2.0f, 500, 0, collideWithOtherText);
     }
 
     public GameObject CreateEventMessage(string text, Color color, int anchorNumber)

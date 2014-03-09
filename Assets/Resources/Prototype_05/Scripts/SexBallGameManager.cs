@@ -1,10 +1,10 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using System.Collections;
+using UnityEngine;
 
 public class SexBallGameManager : GameManagerBase
 {
-
     public enum Team { One, Two, None };
+
     public GamepadInfoHandler gamepadInfoHandler;
 
     public GameObject teamOneGoal;
@@ -50,6 +50,7 @@ public class SexBallGameManager : GameManagerBase
                     StartGame();
                 }
                 break;
+
             case State.InGame:
                 if (gameTimeMin >= 0 && gameTimeSec <= 0)
                 {
@@ -67,17 +68,20 @@ public class SexBallGameManager : GameManagerBase
                     EndGame();
                 }
                 break;
+
             case State.GameOver:
                 GetWinner();
                 break;
+
             case State.PostGame:
                 break;
+
             default:
                 break;
         }
     }
-    
-    void OnGUI()
+
+    private void OnGUI()
     {
         int boxWidth = 100;
         int boxHeight = 40;
@@ -85,10 +89,9 @@ public class SexBallGameManager : GameManagerBase
         string nl = System.Environment.NewLine;
 
         GUI.Box(new Rect(Screen.width / 2 - boxWidth / 2, 20, boxWidth, boxHeight), gameTimeMin.ToString("0") + ":" + gameTimeSec.ToString("00"));
-        GUI.Box(new Rect(Screen.width / 2 - gap - boxWidth/2, 40, boxWidth, boxHeight), "P1" + nl + teamOneScore.ToString("00"));
-        GUI.Box(new Rect(Screen.width / 2 + gap - boxWidth/2, 40, boxWidth, boxHeight), "P2" + nl + teamTwoScore.ToString("00"));
+        GUI.Box(new Rect(Screen.width / 2 - gap - boxWidth / 2, 40, boxWidth, boxHeight), "P1" + nl + teamOneScore.ToString("00"));
+        GUI.Box(new Rect(Screen.width / 2 + gap - boxWidth / 2, 40, boxWidth, boxHeight), "P2" + nl + teamTwoScore.ToString("00"));
     }
-    
 
     private bool IsGameTimeOver()
     {
@@ -124,14 +127,13 @@ public class SexBallGameManager : GameManagerBase
     {
         if (teamOneScore > teamTwoScore)
         {
-            return Team.One;
             CreateEventMessage("Left player wins!", Color.white, 12.0f, 0, 600, 0);
+            return Team.One;
         }
         else if (teamTwoScore > teamOneScore)
         {
-            return Team.Two;
             CreateEventMessage("Right player wins!", Color.white, 12.0f, 0, 600, 0);
-
+            return Team.Two;
         }
         else
         {
@@ -172,13 +174,16 @@ public class SexBallGameManager : GameManagerBase
                 CreateEventMessage("TAP IN!", Color.blue, 3.0f, 0, 600, 0);
 
                 break;
+
             case Team.Two:
                 teamOneScore += 2;
                 CreateEventMessage("TAP IN!", new Color(1.0f, 0.75f, 0.75f), 3.0f, 0, 600, 0);
 
                 break;
+
             case Team.None:
                 break;
+
             default:
                 break;
         }
@@ -193,11 +198,11 @@ public class SexBallGameManager : GameManagerBase
         pause = true;
         gamepadInfoHandler.Disable();
         CreateEventMessage("3", new Color(1.0f, 0.75f, 0.75f), 1.0f, 0, 600, 0);
-        yield return new WaitForSeconds(time/3);
+        yield return new WaitForSeconds(time / 3);
         CreateEventMessage("2", new Color(1.0f, 0.75f, 0.75f), 1.0f, 0, 600, 0);
-        yield return new WaitForSeconds(time/3);
+        yield return new WaitForSeconds(time / 3);
         CreateEventMessage("1", new Color(1.0f, 0.75f, 0.75f), 1.0f, 0, 600, 0);
-        yield return new WaitForSeconds(time/3);
+        yield return new WaitForSeconds(time / 3);
         CreateEventMessage("SAFE", new Color(1.0f, 0.75f, 0.75f), 1.0f, 0, 600, 0);
         pause = false;
         gamepadInfoHandler.Enable();
