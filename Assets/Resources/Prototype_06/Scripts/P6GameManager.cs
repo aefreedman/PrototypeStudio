@@ -40,7 +40,7 @@ public class P6GameManager : GameManagerBase
         combo = 0;
     }
 
-    protected override void FixedUpdate()
+    protected override void Update()
     {
         switch (gameState)
         {
