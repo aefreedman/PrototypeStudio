@@ -21,7 +21,6 @@ public class P6Beat : MonoBehaviour
         {
             entry = true;
             pad = other.gameObject.GetComponent<P6Square>();
-            //other.gameObject.GetComponent<P6Square>().beats.Add(this);
         }
     }
 
@@ -35,8 +34,10 @@ public class P6Beat : MonoBehaviour
         if (entry)
         {
             lifeAfterEntry -= 1;
-            if (lifeAfterEntry <= 0)
+            if (lifeAfterEntry < 0)
             {
+                P6GameManager.Instance.points -= P6GameManager.Instance.beatsPerMinute/4 * P6GameManager.Instance.beatsPerMinute/4;
+                GameManagerBase.Instance.CreateEventMessage("Miss", Color.red, 0.25f, 0.1f, 200, 0, false);
                 Reset();
             }
         }

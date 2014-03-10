@@ -31,7 +31,7 @@ public class SexBallGameManager : GameManagerBase
     {
         base.Start();
         gameState = State.PreGame;
-        gamepadInfoHandler.Disable();
+        //gamepadInfoHandler.Disable();
         canReset = true;
         SetupPlayers();
         pause = false;
@@ -111,7 +111,7 @@ public class SexBallGameManager : GameManagerBase
         teamOneScore = 0;
         teamTwoScore = 0;
         gameTimeStart = Time.time;
-        gamepadInfoHandler.Enable();
+        //gamepadInfoHandler.Enable();
         gameTimeMin = Mathf.FloorToInt(gameTimeLimit / 60);
         gameTimeSec = gameTimeLimit - (60 * gameTimeMin);
         CreateEventMessage("GO!", Color.green, 3.0f, 0, 600, 0);
@@ -196,7 +196,7 @@ public class SexBallGameManager : GameManagerBase
     public IEnumerator PauseGame(float time)
     {
         pause = true;
-        gamepadInfoHandler.Disable();
+        //gamepadInfoHandler.Disable();
         CreateEventMessage("3", new Color(1.0f, 0.75f, 0.75f), 1.0f, 0, 600, 0);
         yield return new WaitForSeconds(time / 3);
         CreateEventMessage("2", new Color(1.0f, 0.75f, 0.75f), 1.0f, 0, 600, 0);
@@ -205,6 +205,6 @@ public class SexBallGameManager : GameManagerBase
         yield return new WaitForSeconds(time / 3);
         CreateEventMessage("SAFE", new Color(1.0f, 0.75f, 0.75f), 1.0f, 0, 600, 0);
         pause = false;
-        gamepadInfoHandler.Enable();
+        //gamepadInfoHandler.Enable();
     }
 }

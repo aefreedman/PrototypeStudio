@@ -18,7 +18,15 @@ public class GamepadInfoHandler : MonoBehaviour
     public Dictionary<GamepadInfo, GameObject> gamepadPlayerDictionary;
     public GamepadInfo[] gamepads;
     public int managerCount = 1;
-    private bool acceptingInput;
+    //private bool acceptingInput;
+    private bool isReady = false;
+    public bool IsReady
+    {
+        get
+        {
+            return IsReady;
+        }
+    }
 
     private static GamepadInfoHandler instance;
 
@@ -68,13 +76,13 @@ public class GamepadInfoHandler : MonoBehaviour
 
     private void Start()
     {
-        acceptingInput = true;
+        //acceptingInput = true;
         numberOfConnectedControllers = Input.GetJoystickNames().Length;
 
         gamepadPlayerDictionary = new Dictionary<GamepadInfo, GameObject>();
         gamepads = new GamepadInfo[numberOfConnectedControllers];
 
-        Debug.Log("[GamepadHandler] Found " + numberOfConnectedControllers.ToString() + " Controllers." + "with " + this.gameObject.name.ToString());
+        Debug.Log("[GamepadHandler] Found " + numberOfConnectedControllers.ToString() + " Controllers.");
 
         for (int i = 0; i < numberOfConnectedControllers; i++)
         {
@@ -90,15 +98,22 @@ public class GamepadInfoHandler : MonoBehaviour
         GamepadInfo freeGamepad = null;
         //do we have an entry where the value is null? (open gamepad)
         //get the key where the value is null
-        foreach (KeyValuePair<GamepadInfo, GameObject> pair in gamepadPlayerDictionary)
+        if (gamepadPlayerDictionary != null)
         {
-            if (pair.Key is GamepadInfo && pair.Value == null)
+            foreach (KeyValuePair<GamepadInfo, GameObject> pair in gamepadPlayerDictionary)
             {
-                freeGamepad = (GamepadInfo)pair.Key;
+                if (pair.Key is GamepadInfo && pair.Value == null)
+                {
+                    freeGamepad = (GamepadInfo)pair.Key;
+                }
             }
+            return freeGamepad;
         }
-
-        return freeGamepad;
+        else
+        {
+            Debug.LogError("[GamepadHandler] Dictionary null!");
+            return null;
+        }
     }
 
     /// <summary>
@@ -119,18 +134,16 @@ public class GamepadInfoHandler : MonoBehaviour
         {
             Debug.Log("[GamepadHandler] Attaching...");
             gamepadPlayerDictionary[freeGamepad] = unattachedPlayer;
-            //Debug.Log("Attempting to call Player.setGamepad");
-            //unattachedPlayer.SetGamepad(freeGamepad);
             return freeGamepad;
         }
     }
 
     private void Update()
     {
-        if (acceptingInput)
-        {
+        //if (acceptingInput)
+        //{
             GetJoystickData();
-        }
+        //}
     }
 
     private void GetJoystickData()
@@ -196,13 +209,13 @@ public class GamepadInfoHandler : MonoBehaviour
         }
     }
 
-    public void Disable()
-    {
-        acceptingInput = false;
-    }
+    //public void Disable()
+    //{
+    //    acceptingInput = false;
+    //}
 
-    public void Enable()
-    {
-        acceptingInput = true;
-    }
+    //public void Enable()
+    //{
+    //    acceptingInput = true;
+    //}
 }

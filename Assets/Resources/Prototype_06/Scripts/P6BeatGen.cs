@@ -20,10 +20,9 @@ public class P6BeatGen : MonoBehaviour
 
     public P6Beat GenerateBeat()
     {
-        P6Beat o = ObjectPool.Spawn(beatPrefab, transform.position, Quaternion.identity);
+        P6Beat o = ObjectPool.Spawn(beatPrefab, transform.position, beatPrefab.transform.rotation);
         o.target = targetPad.transform.position;
         o.transform.parent = beatContainer.transform;
-
         return o;
     }
 }
