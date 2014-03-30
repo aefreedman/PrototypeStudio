@@ -8,6 +8,7 @@ public abstract class GameManagerBase : MonoBehaviour
     public bool canReset;
     private GameObject eventTextPrefab;
     public GameObject[] eventTextAnchor;
+    public bool manualSetupTextAnchors;
     private static GameManagerBase instance;
 
     public static GameManagerBase Instance
@@ -38,13 +39,15 @@ public abstract class GameManagerBase : MonoBehaviour
             throw;
         }
 
-        eventTextAnchor = GameObject.FindGameObjectsWithTag("EventTextAnchor") as GameObject[];
-        if (eventTextAnchor == null)
+        if (!manualSetupTextAnchors)
         {
-            Debug.LogWarning("Event Text Anchor missing. Instantiating");
-            eventTextAnchor[0] = GameObject.Instantiate(Resources.Load<GameObject>("generics/prefabs/eventtextanchor")) as GameObject;
+            eventTextAnchor = GameObject.FindGameObjectsWithTag("EventTextAnchor") as GameObject[];
+            if (eventTextAnchor == null)
+            {
+                Debug.LogWarning("Event Text Anchor missing. Instantiating");
+                eventTextAnchor[0] = GameObject.Instantiate(Resources.Load<GameObject>("generics/prefabs/eventtextanchor")) as GameObject;
+            }
         }
-
     }
 
     protected virtual void Update()
@@ -63,6 +66,17 @@ public abstract class GameManagerBase : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Deprecated
+    /// </summary>
+    /// <param name="text"></param>
+    /// <param name="color"></param>
+    /// <param name="time"></param>
+    /// <param name="displace"></param>
+    /// <param name="size"></param>
+    /// <param name="anchorNumber"></param>
+    /// <param name="collideWithOtherText"></param>
+    /// <returns></returns>
     public GameObject CreateEventMessage(string text, Color color, float time = 1.0f, float displace = 2.0f, int size = 500, int anchorNumber = 0, bool collideWithOtherText = true)
     {
         GameObject o;
@@ -82,6 +96,33 @@ public abstract class GameManagerBase : MonoBehaviour
         }
         o.GetComponent<SpringJoint>().connectedBody = eventTextAnchor[anchorNumber].GetComponent<Rigidbody>();
         o.transform.Translate(Vector3.up * displace);
+        o.transform.rotation = eventTextAnchor[anchorNumber].transform.rotation;
+        EventText e = o.GetComponent<EventText>();
+        e.SendText(text, color, time, size);
+        return o;
+    }
+    
+
+    public GameObject CreateEventMessage(string text, Color color, Vector3 displace, float time = 1.0f, int size = 500, int anchorNumber = 0, bool collideWithOtherText = true)
+    {
+        GameObject o;
+        try
+        {
+            o = GameObject.Instantiate(eventTextPrefab, eventTextAnchor[anchorNumber].transform.position, Quaternion.identity) as GameObject;
+        }
+        catch (System.NullReferenceException)
+        {
+            Debug.LogError("Event Text Anchor missing");
+            throw;
+        }
+        o.transform.position = eventTextAnchor[anchorNumber].transform.position;
+        if (!collideWithOtherText)
+        {
+            o.collider.isTrigger = true;
+        }
+        o.GetComponent<SpringJoint>().connectedBody = eventTextAnchor[anchorNumber].GetComponent<Rigidbody>();
+        o.transform.Translate(displace);
+        o.transform.rotation = eventTextAnchor[anchorNumber].transform.rotation;
         EventText e = o.GetComponent<EventText>();
         e.SendText(text, color, time, size);
         return o;
@@ -89,17 +130,17 @@ public abstract class GameManagerBase : MonoBehaviour
 
     public GameObject CreateEventMessage(string text, Color color, int anchorNumber, bool collideWithOtherText)
     {
-        return CreateEventMessage(text, color, 1.0f, 2.0f, 500, anchorNumber, collideWithOtherText);
+        return CreateEventMessage(text, color, new Vector3(0, 2.0f, 0), 1.0f, 500, anchorNumber, collideWithOtherText);
     }
 
     public GameObject CreateEventMessage(string text, Color color, bool collideWithOtherText)
     {
-        return CreateEventMessage(text, color, 1.0f, 2.0f, 500, 0, collideWithOtherText);
+        return CreateEventMessage(text, color, new Vector3(0, 2.0f, 0), 1.0f, 500, 0, collideWithOtherText);
     }
 
     public GameObject CreateEventMessage(string text, Color color, int anchorNumber)
     {
-        return CreateEventMessage(text, color, 1.0f, 2.0f, 500, anchorNumber);
+        return CreateEventMessage(text, color, Vector3.zero, 1.0f, 500, anchorNumber);
     }
 
     public GameObject SpawnGameObject(GameObject objectToSpawn)
@@ -112,6 +153,13 @@ public abstract class GameManagerBase : MonoBehaviour
     {
         GameObject o = GameObject.Instantiate(objectToSpawn, pos, Quaternion.identity) as GameObject;
         return o;
+    }
+
+    public State SwitchGameState(State newState)
+    {
+        gameState = newState;
+        //Debug.Log("[GM] Switched gamestate to " + gameState.GetType().ToString());
+        return gameState;
     }
 
     /* Todo: Basic gameplay control commands
