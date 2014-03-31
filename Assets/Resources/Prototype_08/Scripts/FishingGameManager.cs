@@ -14,7 +14,9 @@ public class FishingGameManager : GameManagerBase
     private int lookTargetAnchor;
     public Vector3 hsvTarget;
     private Vector3 hsvCurrent;
+    public Color colorTarget;
     public float cameraColorLerpSpeed;
+    public AudioClip waterDrop;
 
     protected override void Start()
     {
@@ -30,6 +32,8 @@ public class FishingGameManager : GameManagerBase
         lookTargetAnchor = 0;
         hsvCurrent = new Vector3(194.0f / 255.0f, 0.96f, 0);
         lookAtText = true;
+        Screen.lockCursor = true;
+        Camera.main.backgroundColor = Color.black;
     }
 
     protected override void Update()
@@ -42,15 +46,18 @@ public class FishingGameManager : GameManagerBase
 
             case State.InGame:
                 Quaternion playerLookTarget = Quaternion.identity;
-                Camera.main.backgroundColor = UnityEditor.EditorGUIUtility.HSVToRGB(hsvCurrent.x, hsvCurrent.y, hsvCurrent.z);
-
+                //Camera.main.backgroundColor = UnityEditor.EditorGUIUtility.HSVToRGB(hsvCurrent.x, hsvCurrent.y, hsvCurrent.z);
+                //int r, g, b;
+                //Utilities.HsvToRgb(hsvCurrent.x, hsvCurrent.y, hsvCurrent.z, out r, out g, out b);
+                //Camera.main.backgroundColor = new Color(r / 255, g / 255, b / 255);
                 #region scripted stuff for start of game
 
                 if (Input.GetButton("Vertical"))
                 {
                     if (Input.GetAxis("Vertical") > 0)
                     {
-                        hsvCurrent = Vector3.Lerp(hsvCurrent, hsvTarget, cameraColorLerpSpeed * Time.deltaTime);
+                        //hsvCurrent = Vector3.Lerp(hsvCurrent, hsvTarget, cameraColorLerpSpeed * Time.deltaTime);
+                        Camera.main.backgroundColor = Color.Lerp(Camera.main.backgroundColor, colorTarget, cameraColorLerpSpeed * Time.deltaTime);
                     }
                 }
 
@@ -63,7 +70,7 @@ public class FishingGameManager : GameManagerBase
 
                 if (lookAtText)
                 {
-                    player.transform.LookAt(eventTextAnchor[lookTargetAnchor].transform);
+                    //player.transform.LookAt(eventTextAnchor[lookTargetAnchor].transform);
                 }
 
                 if (allowInput)
@@ -111,6 +118,7 @@ public class FishingGameManager : GameManagerBase
                 break;
 
             case State.GameOver:
+                Camera.main.backgroundColor = Color.black;
                 break;
 
             case State.PostGame:
@@ -141,10 +149,11 @@ public class FishingGameManager : GameManagerBase
         }
     }
 
-    private IEnumerator GenerateText(DialogueUnit input, float delay, string text)
+    private IEnumerator GenerateText(DialogueUnit input, string text, float delay, int index = 0)
     {
         yield return new WaitForSeconds(delay);
-        GameObject o = CreateEventMessage(text, input.color, input.displacement, input.displayTime, input.size, 0, false);
+        lookTargetAnchor = input.targetAnchorNumber[index];
+        GameObject o = CreateEventMessage(input.text[index], input.color, input.displacement, input.displayTime[index], input.size, input.targetAnchorNumber[index], false);
         o.transform.Rotate(Vector3.right * 45);
         o.GetComponent<TextMesh>().offsetZ = input.displacement.z;
         o.GetComponent<SpringJoint>().damper = 0.85f;
@@ -160,7 +169,6 @@ public class FishingGameManager : GameManagerBase
         {
             yield return new WaitForSeconds(input.delay[0]);
             lookAtText = true;
-            lookTargetAnchor = input.targetAnchorNumber;
             string s = "";
             float delay = 0.0f;
             if (input.displayStyle == DialogueUnit.DisplayStyle.multiline)
@@ -169,31 +177,46 @@ public class FishingGameManager : GameManagerBase
                 {
                     s = s + input.text[i] + System.Environment.NewLine;
                 }
-                StartCoroutine(GenerateText(input, 0, s));
+                lookTargetAnchor = input.targetAnchorNumber[0];
+                StartCoroutine(GenerateText(input, s, 0));
             }
             else if (input.displayStyle == DialogueUnit.DisplayStyle.singleline)
             {
                 for (int i = 0; i < input.text.Length; i++)
                 {
                     s = input.text[i] + System.Environment.NewLine;
-                    delay += input.delay[i+1];
-                    StartCoroutine(GenerateText(input, delay, s));
+                    delay += input.delay[i + 1];
+                    StartCoroutine(GenerateText(input, s, input.delay[i + 1], i));
+                    yield return new WaitForSeconds(input.displayTime[i] + input.delay[i + 1]);
                 }
             }
-            nextDialogueUnit = input.nextDialogueUnit;
-            input.seen = true;
-            canNextText = true;
-            if (input.promptAfter)
+
+            if (input.isEnd)
             {
-                allowInput = true;
+                audio.Stop();
+                audio.PlayOneShot(waterDrop);
+                SwitchGameState(State.GameOver);
             }
             else
             {
-                if (nextDialogueUnit != null)
+
+                nextDialogueUnit = input.nextDialogueUnit;
+                input.seen = true;
+                canNextText = true;
+                if (input.promptAfter)
                 {
-                    StartCoroutine(QueueDialogue(delay + nextDialogueUnit.delay[0], nextDialogueUnit));
+                    allowInput = true;
+                }
+                else
+                {
+                    if (nextDialogueUnit != null)
+                    {
+                        StartCoroutine(QueueDialogue(delay + nextDialogueUnit.delay[0], nextDialogueUnit));
+                    }
                 }
             }
+
+
         }
     }
 

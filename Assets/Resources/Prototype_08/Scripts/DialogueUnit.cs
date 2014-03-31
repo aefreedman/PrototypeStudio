@@ -7,13 +7,14 @@ public class DialogueUnit : MonoBehaviour
     public DisplayStyle displayStyle;
     
     public bool seen;
-    public string[] text;
-    public float[] delay;
     public bool promptAfter;
+    public bool isEnd;
     public Color color;
-    public float displayTime;
     public int size;
     public Vector3 displacement;
-    public int targetAnchorNumber;
     public DialogueUnit nextDialogueUnit;
+    public string[] text;
+    public float[] delay;
+    public float[] displayTime;
+    public int[] targetAnchorNumber;
 }

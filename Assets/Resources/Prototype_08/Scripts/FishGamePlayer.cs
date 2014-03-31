@@ -19,5 +19,9 @@ public class FishGamePlayer : MonoBehaviour
             gm.SendMessage("TriggerDialogue");
             started = true;
         }
+        if (other.CompareTag("ResetTrigger"))
+        {
+            Application.LoadLevel(Application.loadedLevel);
+        }
     }
 }
