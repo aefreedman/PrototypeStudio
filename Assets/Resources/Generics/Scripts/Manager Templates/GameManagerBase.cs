@@ -158,7 +158,6 @@ public abstract class GameManagerBase : MonoBehaviour
     public State SwitchGameState(State newState)
     {
         gameState = newState;
-        //Debug.Log("[GM] Switched gamestate to " + gameState.GetType().ToString());
         return gameState;
     }
 

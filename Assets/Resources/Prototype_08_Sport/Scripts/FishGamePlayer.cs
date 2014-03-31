@@ -3,12 +3,10 @@
 public class FishGamePlayer : MonoBehaviour
 {
 
-    private FishingGameManager gm;
     private bool started;
     
     private void Start()
     {
-        gm = (FishingGameManager)GameManagerBase.Instance;
         started = false;
     }
 
@@ -16,7 +14,7 @@ public class FishGamePlayer : MonoBehaviour
     {
         if (other.CompareTag("Trigger") && !started)
         {
-            gm.SendMessage("TriggerDialogue");
+            DialogueController.Instance.SendMessage("TriggerDialogue");
             started = true;
         }
         if (other.CompareTag("ResetTrigger"))

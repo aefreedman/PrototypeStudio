@@ -7,16 +7,6 @@ public static class Utilities
         return value % 2 != 0;
     }
 
-    ///// <summary>
-    ///// Converts HSV using [0, 255] to Unity format RGB using [0, 1.0]
-    ///// </summary>
-    ///// <param name="h"></param>
-    ///// <returns></returns>
-    //public static Color GetRGBfromHSV(float _h, float _s, float _v)
-    //{
-    //    //return UnityEditor.EditorGUIUtility.HSVToRGB(_h / 255.0f, _s / 255.0f, _v / 255.0f);
-    //}
-
     /// <summary>
     /// Convert HSV to RGB
     /// h is from 0-360
