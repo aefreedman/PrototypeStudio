@@ -161,6 +161,20 @@ public abstract class GameManagerBase : MonoBehaviour
         return gameState;
     }
 
+    public static void TakeScreenshot(int res)
+    {
+        string path = Application.persistentDataPath + "/" + System.DateTime.Now.Year.ToString() +
+            System.DateTime.Now.Month.ToString() + System.DateTime.Now.Day.ToString() + "_" +
+            System.DateTime.Now.Hour.ToString() + System.DateTime.Now.Minute.ToString() +
+            System.DateTime.Now.Second.ToString() +
+            System.DateTime.Now.Millisecond.ToString() +
+            "_ps_scr.png";
+
+        Application.CaptureScreenshot(path, res);
+        path = Application.persistentDataPath + "/" + path;
+        Debug.Log(path);
+    }
+
     /* Todo: Basic gameplay control commands
      * Restart, Debug on/off
      * 
