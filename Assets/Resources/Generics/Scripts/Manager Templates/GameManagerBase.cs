@@ -6,6 +6,7 @@ public abstract class GameManagerBase : MonoBehaviour
     public enum State { PreGame, InGame, GameOver, PostGame, Debug };
     public State gameState;
     public bool startDebug;
+    public bool useMouseCursor;
     public bool canReset;
     private GameObject eventTextPrefab;
     public GameObject[] eventTextAnchor;
@@ -31,7 +32,17 @@ public abstract class GameManagerBase : MonoBehaviour
     protected virtual void Start()
     {
         Physics.gravity = new Vector3(0, -9.81f, 0);
-        
+        if (useMouseCursor)
+        {
+            Screen.showCursor = true;
+            Screen.lockCursor = false;
+        }
+        else
+        {
+            Screen.showCursor = false;
+            Screen.lockCursor = true; ;
+        }
+
         try
         {
             eventTextPrefab = Resources.Load<GameObject>("generics/prefabs/eventtext");
@@ -102,7 +113,7 @@ public abstract class GameManagerBase : MonoBehaviour
         e.SendText(text, color, time, size);
         return o;
     }
-    
+
 
     public GameObject CreateEventMessage(string text, Color color, Vector3 displace, float time = 1.0f, int size = 500, int anchorNumber = 0, bool collideWithOtherText = true)
     {
