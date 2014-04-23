@@ -14,11 +14,13 @@ public class MoneyMaker : MonoBehaviour
     public float shuttleMultiplier;
     private MoneyClicker[] clickers;
     public float maxShake;
-
+    private MMGameManager gm;
     private void Start()
     {
         target = left;
         clickers = GetComponentsInChildren<MoneyClicker>();
+        gm = (MMGameManager)GameManagerBase.Instance;
+
     }
 
     private void Update()
@@ -34,7 +36,7 @@ public class MoneyMaker : MonoBehaviour
                 if (MakeMoney(pos, shuttleMakesThisMuch))
                 {
                     IncrementShuttle();
-                    MMGameManager.Instance.mainCamera.GetComponent<ScreenShake>().StartShake(0.1f + maxShake * Mathf.Clamp(MMGameManager.Instance.dollars, 0, 1000000.0f) / 1000000.0f, 0.1f + maxShake * Mathf.Clamp(MMGameManager.Instance.dollars, 0, 1000000.0f) / 1000000.0f);
+                    Camera.main.GetComponent<ScreenShake>().StartShake(0.1f + maxShake * Mathf.Clamp(gm.dollars, 0, 1000000.0f) / 1000000.0f, 0.1f + maxShake * Mathf.Clamp(gm.dollars, 0, 1000000.0f) / 1000000.0f);
                 }
                 target = right;
             }
@@ -71,7 +73,7 @@ public class MoneyMaker : MonoBehaviour
 
     public bool MakeMoney(Vector3 pos, float amount)
     {
-        if (MMGameManager.Instance.MakeDollars(amount))
+        if (gm.MakeDollars(amount))
         {
             GameObject.Instantiate(moneyPrefab, pos, Quaternion.identity);
             audio.PlayOneShot(audio.clip);

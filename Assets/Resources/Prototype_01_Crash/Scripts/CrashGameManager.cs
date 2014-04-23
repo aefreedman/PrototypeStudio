@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class CrashGameManager : MonoBehaviour
+public class CrashGameManager : GameManagerBase
 {
 
     public enum GameState { Playing, GameOver };

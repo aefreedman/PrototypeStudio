@@ -2,13 +2,10 @@
 using System.Collections.Generic;
 using MMConstants;
 
-public class MMGameManager : MonoBehaviour
+public class MMGameManager : GameManagerBase
 {
-    public enum State { playing, win, over, debug };
-    public State gameState;
 
     public bool debugMode;
-    public GameObject mainCamera;
     private List<MoneyRecepticle> moneyRecepticles;
     public float dollars;
     public TextMesh textMesh;
@@ -29,45 +26,26 @@ public class MMGameManager : MonoBehaviour
     public float shuttleUpgradeCost;
     public float shuttleUpgradeCostMultiplier;
     public float shuttleSpeedAdd;
-    public GameObject eventTextAnchor;
-    public GameObject eventTextPrefab;
+    //public GameObject eventTextAnchor;
+    //public GameObject eventTextPrefab;
     public AudioClip scream;
     private float totalDollars;
     public float minimumFramesPerSecond;
 
-    private static MMGameManager instance;
-
-    public static MMGameManager Instance
+    protected override void Start()
     {
-        get
-        {
-            if (instance == null)
-            {
-                Instance = FindObjectOfType<MMGameManager>();
-            }
-            return instance;
-        }
-        set
-        {
-            instance = value;
-        }
-
-    }
-
-    private void Start()
-    {
+        base.Start();
         lastTax = Time.time;
         moneyRecepticles = new List<MoneyRecepticle>();
         MoneyRecepticle[] r = FindObjectsOfType<MoneyRecepticle>();
         moneyRecepticles.AddRange(r);
         dollars += startingCash;
         Physics.gravity = new Vector3(0, -5.0f, 0);
-        mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
         totalDollars = 0;
         SetDebugParameters();
 
-        CreateEventMessage("Make a million bucks", Color.yellow, 10.0f, 3.0f);
-        CreateEventMessage("Click stuff", Color.white, 10.0f, 2.0f);
+        CreateEventMessage("Make a million bucks", Color.yellow, Vector3.up * 3.0f, 10.0f);
+        CreateEventMessage("Click stuff", Color.white, Vector3.up * 2.0f, 10.0f);
     }
 
     private void SetDebugParameters()
@@ -95,7 +73,10 @@ public class MMGameManager : MonoBehaviour
 
         switch (gameState)
         {
-            case State.playing:
+            case State.PreGame:
+                gameState = State.InGame;
+                break;
+            case State.InGame:
                 int recepticles = 0;
                 foreach (var m in moneyRecepticles)
                 {
@@ -133,16 +114,16 @@ public class MMGameManager : MonoBehaviour
 
                 if (dollars >= 1000000.0f)
                 {
-                    gameState = State.win;
+                    gameState = State.GameOver;
                 }
                 break;
-            case State.win:
-                CreateEventMessage("GREAT SUCCESS", Color.cyan, 120.0f, 4.0f);
-                CreateEventMessage("You made $" + totalDollars.ToString("0,000.00"), Color.yellow, 120.0f, 3.0f);
-                CreateEventMessage("in " + Time.time.ToString("0.00") + "s", Color.white, 120.0f, 2.0f);
-                gameState = State.over;
+            case State.GameOver:
+                CreateEventMessage("GREAT SUCCESS", Color.cyan, Vector3.up * 4.0f, 120.0f);
+                CreateEventMessage("You made $" + totalDollars.ToString("0,000.00"), Color.yellow, Vector3.up * 3.0f, 120.0f);
+                CreateEventMessage("in " + Time.time.ToString("0.00") + "s", Color.white, Vector3.up * 2.0f, 120.0f);
+                gameState = State.PostGame;
                 break;
-            case State.over:
+            case State.PostGame:
                 break;
             default:
                 break;
@@ -276,7 +257,7 @@ public class MMGameManager : MonoBehaviour
                 break;
             case Item.Premium:
                 //eventText.SendText("Premium Version Only!", new Color(1f, 0.5f, 0));
-                CreateEventMessage("Premium Version Only!", new Color(1f, 0.5f, 0));
+                CreateEventMessage("Premium Version Only!", new Color(1f, 0.5f, 0), false);
                 break;
             case Item.GiveUp:
                 Application.LoadLevel(0);
@@ -301,15 +282,15 @@ public class MMGameManager : MonoBehaviour
         MoneyMaker m = o.GetComponent<MoneyMaker>();
         moneyMaker = m;
         //eventText.SendText("Make that money!", Color.yellow, 2.0f);
-        CreateEventMessage("Make that money!", Color.yellow, 2.0f);
-        CreateEventMessage("Click on it", Color.gray, 2.0f, 1.0f);
+        CreateEventMessage("Make that money!", Color.yellow, 0);
+        CreateEventMessage("Click on it", Color.gray, Vector3.up);
     }
 
     private void IncreaseShuttleSpeed()
     {
         moneyMaker.speed += shuttleSpeedAdd;
         shuttleUpgradeCost *= shuttleUpgradeCostMultiplier;
-        CreateEventMessage("Shake it to make it", Color.white, 2.0f);
+        CreateEventMessage("Shake it to make it", Color.white);
     }
 
     private void Taxes(float amount)
@@ -320,18 +301,18 @@ public class MMGameManager : MonoBehaviour
         p.SetText("-$" + amount.ToString("0.00") + " (Taxes)", Color.red);
         CreateEventMessage("TAXES", Color.red, 1.0f);
         audio.PlayOneShot(scream);
-        mainCamera.GetComponent<ScreenShake>().StartShake(0.1f, 0.5f);
+        Camera.main.GetComponent<ScreenShake>().StartShake(0.1f, 0.5f);
     }
 
-    public GameObject CreateEventMessage(string text, Color color, float time = 1.0f, float displace = 2.0f)
-    {
-        GameObject o = GameObject.Instantiate(eventTextPrefab) as GameObject;
-        o.GetComponent<SpringJoint>().connectedBody = eventTextAnchor.GetComponent<Rigidbody>();
-        o.transform.Translate(Vector3.up * displace);
-        EventText e = o.GetComponent<EventText>();
-        e.SendText(text, color, time);
-        return o;
-    }
+    //public GameObject CreateEventMessage(string text, Color color, float time = 1.0f, float displace = 2.0f)
+    //{
+    //    GameObject o = GameObject.Instantiate(eventTextPrefab) as GameObject;
+    //    o.GetComponent<SpringJoint>().connectedBody = eventTextAnchor.GetComponent<Rigidbody>();
+    //    o.transform.Translate(Vector3.up * displace);
+    //    EventText e = o.GetComponent<EventText>();
+    //    e.SendText(text, color, time);
+    //    return o;
+    //}
 
     private void ClearMoneyObjects()
     {

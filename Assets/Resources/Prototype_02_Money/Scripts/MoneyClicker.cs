@@ -9,9 +9,12 @@ public class MoneyClicker : MonoBehaviour
     public float clickingMultiplier;
     public float maxShake;
 
+    private MMGameManager gm;
+
     private void Start()
     {
         makerInstance = moneyMaker.GetComponent<MoneyMaker>();
+        gm = (MMGameManager)GameManagerBase.Instance;
     }
 
     private void OnMouseOver()
@@ -21,10 +24,10 @@ public class MoneyClicker : MonoBehaviour
             if (makerInstance.MakeMoney(new Vector3(transform.position.x, transform.position.y, -3), clickingMakesThisMuch))
             {
                 IncrementClicker();
-                MMGameManager.Instance.mainCamera.GetComponent<ScreenShake>().StartShake(0.1f + maxShake * Mathf.Clamp(MMGameManager.Instance.dollars, 0, 1000000.0f) / 1000000.0f, 0.1f + maxShake * Mathf.Clamp(MMGameManager.Instance.dollars, 0, 1000000.0f) / 1000000.0f);
+                Camera.main.GetComponent<ScreenShake>().StartShake(0.1f + maxShake * Mathf.Clamp(gm.dollars, 0, 1000000.0f) / 1000000.0f, 0.1f + maxShake * Mathf.Clamp(gm.dollars, 0, 1000000.0f) / 1000000.0f);
                 if (Random.Range(0, 100) == 0)
                 {
-                    MMGameManager.Instance.CreateEventMessage("Dolla dolla billz, y'all!", Color.yellow, 2.0f);
+                    gm.CreateEventMessage("Dolla dolla billz, y'all!", Color.yellow, 2.0f);
                 }
             }
         }

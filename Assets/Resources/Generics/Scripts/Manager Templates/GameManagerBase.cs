@@ -1,8 +1,9 @@
 ﻿using UnityEngine;
+using System;
 
 public abstract class GameManagerBase : MonoBehaviour
 {
-    public enum State { PreGame, InGame, GameOver, PostGame };
+    public enum State { PreGame, InGame, GameOver, PostGame, Debug };
     public State gameState;
     public bool startDebug;
     public bool canReset;
@@ -29,6 +30,8 @@ public abstract class GameManagerBase : MonoBehaviour
 
     protected virtual void Start()
     {
+        Physics.gravity = new Vector3(0, -9.81f, 0);
+        
         try
         {
             eventTextPrefab = Resources.Load<GameObject>("generics/prefabs/eventtext");
@@ -47,6 +50,10 @@ public abstract class GameManagerBase : MonoBehaviour
                 Debug.LogWarning("Event Text Anchor missing. Instantiating");
                 eventTextAnchor[0] = GameObject.Instantiate(Resources.Load<GameObject>("generics/prefabs/eventtextanchor")) as GameObject;
             }
+            else
+            {
+                Debug.Log("Found" + eventTextAnchor.Length.ToString() + " text anchors.");
+            }
         }
     }
 
@@ -64,19 +71,13 @@ public abstract class GameManagerBase : MonoBehaviour
                 Application.LoadLevel(Application.loadedLevel);
             }
         }
+        if (Input.GetButtonDown("ReturnToMenu"))
+        {
+            Application.LoadLevel(0);
+        }
     }
 
-    /// <summary>
-    /// Deprecated
-    /// </summary>
-    /// <param name="text"></param>
-    /// <param name="color"></param>
-    /// <param name="time"></param>
-    /// <param name="displace"></param>
-    /// <param name="size"></param>
-    /// <param name="anchorNumber"></param>
-    /// <param name="collideWithOtherText"></param>
-    /// <returns></returns>
+    [Obsolete("Use CreateEventMessage(string, Color, Vector3, float, int, int, bool) instead")]
     public GameObject CreateEventMessage(string text, Color color, float time = 1.0f, float displace = 2.0f, int size = 500, int anchorNumber = 0, bool collideWithOtherText = true)
     {
         GameObject o;

@@ -12,10 +12,7 @@ public class CameraController : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetButton("CameraHorizontal"))
-        {
-        }
-        Camera.main.transform.Translate(new Vector3(Input.GetAxis("CameraHorizontal") * scale, Input.GetAxis("CameraVertical") * scale));
+        Camera.main.transform.Translate(new Vector3(Input.GetAxis("Horizontal") * scale, Input.GetAxis("Vertical") * scale));
         if (Input.GetAxis("Mouse ScrollWheel") > 0)
         {
             float x = 3.0f/4.0f;

@@ -18,9 +18,12 @@ public class MenuItem : MonoBehaviour
         }
     }
 
+    MMGameManager gm;
+
     private void Start()
     {
         textMesh = GetComponent<TextMesh>();
+        gm = (MMGameManager)GameManagerBase.Instance;
     }
 
     void OnMouseOver()
@@ -30,7 +33,7 @@ public class MenuItem : MonoBehaviour
         {
             if (!disable)
             {
-                MMGameManager.Instance.SpawnItem(itemToSpawn);
+                gm.SpawnItem(itemToSpawn);
 
                 switch (itemToSpawn)
                 {
