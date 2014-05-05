@@ -8,7 +8,7 @@ public abstract class GameManagerBase : MonoBehaviour
     public bool startDebug;
     public bool useMouseCursor;
     public bool canReset;
-    private GameObject eventTextPrefab;
+    public GameObject eventTextPrefab;
     public GameObject[] eventTextAnchor;
     public bool manualSetupTextAnchors;
     private static GameManagerBase instance;
@@ -42,16 +42,19 @@ public abstract class GameManagerBase : MonoBehaviour
             Screen.showCursor = false;
             Screen.lockCursor = true; ;
         }
+        if (eventTextPrefab == null)
+        {
+            try
+            {
+                eventTextPrefab = Resources.Load<GameObject>("generics/prefabs/eventtext");
+            }
+            catch (System.NullReferenceException)
+            {
+                Debug.LogWarning("Event Text Prefab not found.");
+                throw;
+            }
+        }
 
-        try
-        {
-            eventTextPrefab = Resources.Load<GameObject>("generics/prefabs/eventtext");
-        }
-        catch (System.NullReferenceException)
-        {
-            Debug.LogWarning("Event Text Prefab not found.");
-            throw;
-        }
 
         if (!manualSetupTextAnchors)
         {
@@ -86,6 +89,11 @@ public abstract class GameManagerBase : MonoBehaviour
         {
             Application.LoadLevel(0);
         }
+    }
+
+    protected void ResetGame()
+    {
+        Application.LoadLevel(Application.loadedLevel);
     }
 
     [Obsolete("Use CreateEventMessage(string, Color, Vector3, float, int, int, bool) instead")]
